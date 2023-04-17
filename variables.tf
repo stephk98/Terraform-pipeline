@@ -5,7 +5,7 @@ variable "location" {
 
 variable "prefix" {
   type = string
-  default = "RegenerationProject"
+  default = "RegenerationProject2"
 }
 
 variable "admin_username" {

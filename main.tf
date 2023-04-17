@@ -18,7 +18,7 @@ provider "azurerm" {
 
 # Create resource group with workspace name
 resource "azurerm_resource_group" "main" {
-  name     = "${var.prefix}-codehub-reg"
+  name     = "${var.prefix}-codehub-reg2"
   location = var.location
 }
 
@@ -109,34 +109,32 @@ resource "azurerm_network_interface_security_group_association" "example" {
 }
 
 # Create virtual machine
-resource "azurerm_virtual_machine" "my_terraform_vm" {
-  name                  = "myVirtualMachine2"
+resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
+  name                  = "myVM2"
   location              = azurerm_resource_group.main.location
   resource_group_name   = azurerm_resource_group.main.name
   network_interface_ids = [azurerm_network_interface.my_terraform_nic.id]
-  vm_size               = "Standard_B2s"
-  admin_username = var.admin_username
-  computer_name  = "node"
-  disable_password_authentication = false
+  size                  = "Standard_B2s"
 
-  delete_os_disk_on_termination    = true
-  delete_data_disks_on_termination = true
+  os_disk {
+    name                 = "myOsDisk2"
+    caching              = "ReadWrite"
+    storage_account_type = "Premium_LRS"
+  }
 
-  storage_image_reference {
+  source_image_reference {
     publisher = "Canonical"
     offer     = "0001-com-ubuntu-server-jammy"
     sku       = "22_04-lts-gen2"
     version   = "latest"
   }
-  storage_os_disk {
-    name              = "myOsDisk2"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
-  }
+
+  computer_name                   = "node"
+  admin_username                  = "azureuser"
+  disable_password_authentication = true
 
   admin_ssh_key {
-    username   = var.admin_username
+    username   = "azureuser"
     public_key = tls_private_key.example_ssh.public_key_openssh
   }
 }
